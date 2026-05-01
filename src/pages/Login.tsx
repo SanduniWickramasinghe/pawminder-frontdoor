@@ -107,7 +107,17 @@ export default function Login() {
             />
             <span className="text-sm font-bold text-foreground">Remember me</span>
           </label>
-          <button type="button" className="text-sm font-bold text-primary">
+          <button
+            type="button"
+            onClick={async () => {
+              if (!email) { toast.error("Enter your email first"); return; }
+              // 🔌 API: POST /auth/forgot-password
+              const { petService } = await import("@/services/petService");
+              await petService.requestPasswordReset(email);
+              toast.success("Reset link sent if the email exists");
+            }}
+            className="text-sm font-bold text-primary"
+          >
             Forgot password?
           </button>
         </div>
