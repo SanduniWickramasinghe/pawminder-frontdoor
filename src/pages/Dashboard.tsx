@@ -5,6 +5,7 @@ import { ScheduleCard } from "@/components/ScheduleCard";
 import { QuickAction } from "@/components/QuickAction";
 import { BottomNav } from "@/components/BottomNav";
 import { petService } from "@/services/petService";
+import { toast } from "sonner";
 import type { PetDTO, ScheduleItemDTO } from "@/services/types";
 import { useNavigate } from "react-router-dom";
 
@@ -13,6 +14,7 @@ export default function Dashboard() {
   const [pets, setPets] = useState<PetDTO[]>([]);
   const [activePet, setActivePet] = useState<string>("");
   const [schedule, setSchedule] = useState<ScheduleItemDTO[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     petService.listPets().then((list) => {
@@ -28,7 +30,46 @@ export default function Dashboard() {
 
   const toggleItem = async (id: string, done: boolean) => {
     setSchedule((prev) => prev.map((it) => (it.id === id ? { ...it, done } : it)));
+    // 🔌 API: PATCH /schedule/{id}
     await petService.toggleScheduleItem(id, done);
+  };
+
+  // ---- Quick action handlers ----
+  const handleLogMeal = async () => {
+    try {
+      await petService.logMeal(activePet);
+      toast.success("Meal logged");
+    } catch { toast.error("Could not log meal"); }
+  };
+
+  const handleLogWeight = async () => {
+    const input = window.prompt("Enter weight in lbs");
+    const value = Number(input);
+    if (!input || Number.isNaN(value)) return;
+    try {
+      await petService.logWeight(activePet, value);
+      toast.success(`Weight ${value} lbs saved`);
+    } catch { toast.error("Could not save weight"); }
+  };
+
+  const handleAddNote = async () => {
+    const text = window.prompt("Add a note");
+    if (!text) return;
+    try {
+      await petService.addNote(activePet, text);
+      toast.success("Note saved");
+    } catch { toast.error("Could not save note"); }
+  };
+
+  const handlePhotoSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const { url } = await petService.uploadFile(file);
+      toast.success("Photo uploaded");
+      console.log("Uploaded photo URL:", url);
+    } catch { toast.error("Upload failed"); }
+    finally { e.target.value = ""; }
   };
 
   return (
@@ -57,6 +98,13 @@ export default function Dashboard() {
           <QuickAction label="Add Note" Icon={FileText} variant="schedule" />
           <QuickAction label="Add Photo" Icon={Camera} variant="pink" />
         </div>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handlePhotoSelected}
+        />
       </section>
 
       <BottomNav />
