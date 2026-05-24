@@ -117,34 +117,47 @@ export const petService = {
     if (USE_MOCK) { await delay(150); return mockVaccinations; }
     return (await apiClient.get<VaccinationDTO[]>(`/pets/${petId}/vaccinations`)).data;
   },
+  async createPet(newPet: PetCreateDTO): Promise<PetDTO> {
+    if (USE_MOCK) {
+      await delay(200);
+      const pet: PetDTO = {
+        id: `p${Date.now()}`,
+        name: newPet.name,
+        species: newPet.species ?? "Dog",
+        breed: newPet.breed ?? "",
+        ageYears: newPet.ageYears ?? 0,
+        weightLbs: newPet.weightLbs ?? 0,
+        microchip: newPet.microchip ?? "",
+      };
+      mockPets.push(pet);
+      return pet;
+    }
+    return (await apiClient.post<PetDTO>("/pets", newPet)).data;
+  },
 
-  // ---------- Reminders ----------
+  async createScheduleItem(item: Omit<ScheduleItemDTO, "id" | "done">): Promise<ScheduleItemDTO> {
+    if (USE_MOCK) {
+      await delay(200);
+      const created: ScheduleItemDTO = { ...item, id: `s${Date.now()}`, done: false };
+      mockSchedule.push(created);
+      return created;
+    }
+    return (await apiClient.post<ScheduleItemDTO>("/schedule", { ...item, done: false })).data;
+  },
+  // GET: Fetch all reminders/schedule items
   async getReminders(): Promise<ReminderDTO[]> {
     if (USE_MOCK) { await delay(150); return mockReminders; }
     return (await apiClient.get<ReminderDTO[]>("/reminders")).data;
   },
-  async createReminder(payload: Omit<ReminderDTO, "id">): Promise<ReminderDTO> {
+
+  // POST: Create a new reminder
+  async createReminder(reminder: Partial<ReminderDTO>): Promise<ReminderDTO> {
     if (USE_MOCK) {
       await delay(200);
-      const created: ReminderDTO = { ...payload, id: String(Date.now()) };
-      mockReminders.push(created);
-      return created;
+      const newReminder = { ...reminder, id: Math.random().toString() } as ReminderDTO;
+      mockReminders.push(newReminder);
+      return newReminder;
     }
-    return (await apiClient.post<ReminderDTO>("/reminders", payload)).data;
-  },
-
-  // ---------- File upload (Cloudinary via Spring Boot) ----------
-  async uploadFile(file: File): Promise<{ url: string }> {
-    if (USE_MOCK) { await delay(300); return { url: URL.createObjectURL(file) }; }
-    const form = new FormData();
-    form.append("file", file);
-    return (await apiClient.post<{ url: string }>("/uploads", form, {
-      headers: { "Content-Type": "multipart/form-data" },
-    })).data;
-  },
-
-  async requestPasswordReset(email: string): Promise<void> {
-    if (USE_MOCK) { await delay(200); return; }
-    await apiClient.post("/auth/forgot-password", { email });
-  },
+    return (await apiClient.post<ReminderDTO>("/reminders", reminder)).data;
+  }
 };
