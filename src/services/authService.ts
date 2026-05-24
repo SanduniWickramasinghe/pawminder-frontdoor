@@ -1,5 +1,5 @@
 import { apiClient, USE_MOCK } from "./apiClient";
-import type { AuthRequestDTO, AuthResponseDTO, SignUpRequestDTO } from "./types";
+import type { AuthRequestDTO, AuthResponseDTO, SignUpRequestDTO, UserDTO } from "./types";
 
 const TOKEN_KEY = "pm_token";
 const USER_KEY = "pm_user";
@@ -59,6 +59,16 @@ export const authService = {
 
   isAuthenticated() {
     return !!localStorage.getItem(TOKEN_KEY);
+  },
+
+  getCurrentUser(): UserDTO | null {
+    const raw = localStorage.getItem(USER_KEY);
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw) as UserDTO;
+    } catch {
+      return null;
+    }
   },
 };
 

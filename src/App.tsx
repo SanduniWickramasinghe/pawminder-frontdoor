@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import Login from "./pages/Login.tsx";
@@ -11,6 +12,8 @@ import Dashboard from "./pages/Dashboard.tsx";
 import Health from "./pages/Health.tsx";
 import Schedule from "./pages/Schedule.tsx";
 import Profile from "./pages/Profile.tsx";
+import AddPet from "./pages/AddPet.tsx";
+import AddSchedule from "./pages/AddSchedule";
 
 const queryClient = new QueryClient();
 
@@ -24,11 +27,54 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/health" element={<Health />} />
-          <Route path="/schedule" element={<Schedule />} />
-          <Route path="/profile" element={<Profile />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/health"
+            element={
+              <ProtectedRoute>
+                <Health />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/schedule"
+            element={
+              <ProtectedRoute>
+                <Schedule />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/schedule/new"
+            element={
+              <ProtectedRoute>
+                <AddSchedule />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/pets/new"
+            element={
+              <ProtectedRoute>
+                <AddPet />
+              </ProtectedRoute>
+            }
+          />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

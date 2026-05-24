@@ -28,14 +28,23 @@ export interface UserDTO {
 export interface PetDTO {
   id: string;
   name: string;
-  species: string;
-  breed: string;
-  ageYears: number;
-  weightLbs: number;
-  microchip: string;
-  insurance: string;
-  policyNumber: string;
-  avatarUrl: string;
+  species?: string;
+  breed?: string;
+  ageYears?: number;
+  weightLbs?: number;
+  microchip?: string;
+  insurance?: string;
+  policyNumber?: string;
+  avatarUrl?: string;
+}
+
+export interface PetCreateDTO {
+  name: string;
+  species?: string;
+  breed?: string;
+  ageYears?: number;
+  weightLbs?: number;
+  microchip?: string;
 }
 
 export interface ScheduleItemDTO {

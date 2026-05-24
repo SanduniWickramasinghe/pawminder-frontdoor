@@ -12,7 +12,7 @@ export default function Profile() {
   const navigate = useNavigate();
   const [pet, setPet] = useState<PetDTO | undefined>();
 
-  useEffect(() => { petService.getPet("1").then(setPet); }, []);
+  useEffect(() => { petService.getPet("69f4760789d22a1338e43bc4").then(setPet); }, []);
 
   const handleLogout = () => {
     authService.logout();

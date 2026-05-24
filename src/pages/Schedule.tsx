@@ -4,10 +4,13 @@ import { ScreenHeader } from "@/components/ScreenHeader";
 import { BottomNav } from "@/components/BottomNav";
 import { petService } from "@/services/petService";
 import type { ReminderDTO } from "@/services/types";
+import { useNavigate } from "react-router-dom";
+import { Plus } from "lucide-react";
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export default function Schedule() {
+  const navigate = useNavigate();
   const [tab, setTab] = useState<"calendar" | "reminders">("calendar");
   const [reminders, setReminders] = useState<ReminderDTO[]>([]);
   const [selected, setSelected] = useState(1);
@@ -31,11 +34,20 @@ export default function Schedule() {
   return (
     <main className="app-shell animate-fade-in">
       <ScreenHeader title="Schedule" subtitle="Manage reminders & events" variant="schedule" />
-
+      {/* Floating Action Button for New Scheduler */}
+      <div className="fixed bottom-[110px] right-6 z-[9999] pointer-events-none">
+        <button
+          onClick={() => navigate("/schedule/new")}
+          className="h-16 w-16 rounded-full gradient-schedule text-white shadow-2xl flex items-center justify-center active:scale-90 transition-all border-4 border-white pointer-events-auto"
+          style={{ boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3)' }}
+        >
+          <Plus size={32} strokeWidth={3} />
+        </button>
+      </div>
       <section className="px-4 -mt-6">
         <div className="bg-card rounded-2xl shadow-card p-2 grid grid-cols-2 gap-2">
-          <TabButton active={tab === "calendar"}  onClick={() => setTab("calendar")}  Icon={CalendarIcon} label="Calendar" />
-          <TabButton active={tab === "reminders"} onClick={() => setTab("reminders")} Icon={Bell}         label="Reminders" />
+          <TabButton active={tab === "calendar"} onClick={() => setTab("calendar")} Icon={CalendarIcon} label="Calendar" />
+          <TabButton active={tab === "reminders"} onClick={() => setTab("reminders")} Icon={Bell} label="Reminders" />
         </div>
       </section>
 
@@ -55,13 +67,12 @@ export default function Schedule() {
                     <button
                       key={i}
                       onClick={() => setSelected(d)}
-                      className={`h-9 w-9 mx-auto rounded-lg text-sm font-bold flex items-center justify-center transition-colors ${
-                        isSelected
+                      className={`h-9 w-9 mx-auto rounded-lg text-sm font-bold flex items-center justify-center transition-colors ${isSelected
                           ? "bg-schedule text-schedule-foreground"
                           : isEvent
-                          ? "bg-schedule/15 text-schedule"
-                          : "text-foreground hover:bg-muted"
-                      }`}
+                            ? "bg-schedule/15 text-schedule"
+                            : "text-foreground hover:bg-muted"
+                        }`}
                     >
                       {d}
                     </button>
@@ -119,9 +130,8 @@ function TabButton({
   return (
     <button
       onClick={onClick}
-      className={`py-3 rounded-xl flex flex-col items-center gap-1 font-bold transition-colors ${
-        active ? "gradient-schedule text-schedule-foreground shadow-card" : "text-muted-foreground"
-      }`}
+      className={`py-3 rounded-xl flex flex-col items-center gap-1 font-bold transition-colors ${active ? "gradient-schedule text-schedule-foreground shadow-card" : "text-muted-foreground"
+        }`}
     >
       <Icon size={20} />
       <span className="text-sm">{label}</span>

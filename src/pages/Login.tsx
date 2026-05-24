@@ -1,5 +1,5 @@
 import { useState, FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff, Check } from "lucide-react";
 import { PawLogo } from "@/components/PawLogo";
 import { authService } from "@/services/authService";
@@ -7,6 +7,8 @@ import { toast } from "sonner";
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const redirectTo = (location.state as { from?: string } | null)?.from ?? "/dashboard";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
@@ -23,7 +25,7 @@ export default function Login() {
     try {
       await authService.login({ email, password, rememberMe: remember });
       toast.success("Welcome back!");
-      navigate("/dashboard");
+      navigate(redirectTo, { replace: true });
     } catch {
       toast.error("Login failed. Please try again.");
     } finally {
@@ -35,7 +37,7 @@ export default function Login() {
     setSubmitting(true);
     try {
       await authService.oauth(provider);
-      navigate("/dashboard");
+      navigate(redirectTo, { replace: true });
     } finally {
       setSubmitting(false);
     }

@@ -4,22 +4,32 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tool
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { BottomNav } from "@/components/BottomNav";
 import { petService } from "@/services/petService";
-import type { VaccinationDTO, WeightPointDTO } from "@/services/types";
+import type { PetDTO, VaccinationDTO, WeightPointDTO } from "@/services/types";
 
 export default function Health() {
+  const [pet, setPet] = useState<PetDTO | null>(null);
   const [weights, setWeights] = useState<WeightPointDTO[]>([]);
   const [vaccs, setVaccs] = useState<VaccinationDTO[]>([]);
 
   useEffect(() => {
-    petService.getWeights("1").then(setWeights);
-    petService.getVaccinations("1").then(setVaccs);
+    petService.listPets().then((pets) => {
+      const active = pets[0] ?? null;
+      setPet(active);
+      if (!active) return;
+      petService.getWeights(active.id).then(setWeights);
+      petService.getVaccinations(active.id).then(setVaccs);
+    });
   }, []);
 
   const current = weights.at(-1)?.weight ?? 0;
 
   return (
     <main className="app-shell animate-fade-in">
-      <ScreenHeader title="Health Records" subtitle="Max's medical history" variant="health" />
+      <ScreenHeader
+        title="Health Records"
+        subtitle={pet ? `${pet.name}'s medical history` : "Add a pet to track health"}
+        variant="health"
+      />
 
       <section className="px-4 -mt-6">
         <div className="bg-card rounded-2xl shadow-card p-5">
